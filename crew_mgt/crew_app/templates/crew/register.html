@@ -1,0 +1,41 @@
+<!-- templates/crew/register.html -->
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="mb-0">Crew Registration</h3>
+                </div>
+                <div class="card-body">
+                    <form method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        
+                        <div class="mb-4">
+                            <h5>Account Information</h5>
+                            {{ registration_form.as_p }}
+                        </div>
+
+                        <div class="mb-4">
+                            <h5>Personal Information</h5>
+                            {{ profile_form.as_p }}
+                        </div>
+
+                        <div class="mb-4">
+                            <h5>Document Upload</h5>
+                            {{ document_form.as_p }}
+                        </div>
+
+                        <button type="submit" class="btn btn-primary">Register</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+

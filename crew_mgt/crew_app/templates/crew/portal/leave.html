@@ -1,0 +1,68 @@
+{# leave.html #}
+{% extends 'crew/portal.html' %}
+{% load static %}
+
+{% block page_title %}Leave Requests{% endblock %}
+
+{% block portal_content %}
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Submit Leave Request</h5>
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    {% for field in form %}
+                    <div class="mb-3">
+                        {{ field.label_tag }}
+                        {{ field }}
+                        {% if field.errors %}
+                        <div class="invalid-feedback d-block">
+                            {{ field.errors }}
+                        </div>
+                        {% endif %}
+                        {% if field.help_text %}
+                        <small class="form-text text-muted">{{ field.help_text }}</small>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                    <button type="submit" class="btn btn-primary">Submit Request</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Recent Requests</h5>
+            </div>
+            <div class="card-body">
+                {% if recent_requests %}
+                <div class="list-group">
+                    {% for request in recent_requests %}
+                    <div class="list-group-item">
+                        <div class="d-flex w-100 justify-content-between">
+                            <h6 class="mb-1">{{ request.leave_type }}</h6>
+                            <small class="text-muted">{{ request.created_at|date }}</small>
+                        </div>
+                        <p class="mb-1">
+                            {{ request.start_date|date }} to {{ request.end_date|date }}
+                        </p>
+                        <small class="text-{{ request.get_status_color }}">
+                            {{ request.get_status_display }}
+                        </small>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <p class="text-muted text-center">No recent leave requests.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

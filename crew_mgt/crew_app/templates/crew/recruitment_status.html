@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="mb-0">Recruitment Status</h2>
+                </div>
+                <div class="card-body">
+                    {% if messages %}
+                        {% for message in messages %}
+                            <div class="alert alert-{{ message.tags }}">
+                                {{ message }}
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                    
+                    {% if profile %}
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <p><strong>Name:</strong> {{ profile.first_name }} {{ profile.last_name }}</p>
+                                <p><strong>Crew ID:</strong> {{ profile.crew_id }}</p>
+                                <p><strong>Department:</strong> {{ profile.department }}</p>
+                            </div>
+                            <div class="col-md-6">
+                                <p><strong>Position:</strong> {{ profile.position }}</p>
+                                <p><strong>Application Date:</strong> {{ profile.date_joined|date:"F d, Y" }}</p>
+                            </div>
+                        </div>
+                        
+                        <div class="alert {% if profile.recruitment_status == 'approved' %}alert-success{% elif profile.recruitment_status == 'rejected' %}alert-danger{% else %}alert-info{% endif %}">
+                            <h4 class="alert-heading">Status: {{ profile.recruitment_status|title }}</h4>
+                            {% if profile.recruitment_status == 'approved' %}
+                                <p>Congratulations! Your application has been approved. You can now access the crew portal.</p>
+                                <a href="{% url 'crew_portal' %}" class="btn btn-success">Go to Crew Portal</a>
+                            {% elif profile.recruitment_status == 'rejected' %}
+                                <p>We regret to inform you that your application has not been approved at this time.</p>
+                            {% else %}
+                                <p>Your application is currently under review. Please check back later for updates.</p>
+                            {% endif %}
+                        </div>
+                    {% else %}
+                        <div class="alert alert-warning">
+                            <p>No profile information found. Please contact support.</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

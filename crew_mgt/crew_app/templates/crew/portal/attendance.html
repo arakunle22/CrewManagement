@@ -1,0 +1,124 @@
+{# attendance.html #}
+{% extends 'crew/portal.html' %}
+{% load static %}
+
+{% block page_title %}Attendance{% endblock %}
+
+{% block portal_content %}
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Today's Attendance</h5>
+            </div>
+            <div class="card-body">
+                <div class="text-center mb-4">
+                    <h3 id="current-time" class="mb-3"></h3>
+                    {% if attendance.clock_in %}
+                        <p class="text-success mb-2">
+                            <i class="fas fa-sign-in-alt"></i> Clocked in at {{ attendance.clock_in|time }}
+                        </p>
+                        {% if not attendance.clock_out %}
+                            <button id="clock-out-btn" class="btn btn-primary">Clock Out</button>
+                        {% else %}
+                            <p class="text-info">
+                                <i class="fas fa-sign-out-alt"></i> Clocked out at {{ attendance.clock_out|time }}
+                            </p>
+                        {% endif %}
+                    {% else %}
+                        <button id="clock-in-btn" class="btn btn-primary">Clock In</button>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Recent Attendance</h5>
+            </div>
+            <div class="card-body">
+                <div class="list-group">
+                    {% for record in recent_attendance %}
+                    <div class="list-group-item">
+                        <h6 class="mb-1">{{ record.date|date }}</h6>
+                        {% if record.clock_in %}
+                        <small class="text-success">In: {{ record.clock_in|time }}</small>
+                        {% endif %}
+                        {% if record.clock_out %}
+                        <br><small class="text-info">Out: {{ record.clock_out|time }}</small>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const clockInBtn = document.getElementById('clock-in-btn');
+    const clockOutBtn = document.getElementById('clock-out-btn');
+    
+    function showToast(message, type = 'success') {
+        const toast = document.createElement('div');
+        toast.className = `alert alert-${type} alert-dismissible fade show position-fixed top-0 end-0 m-3`;
+        toast.innerHTML = `
+            ${message}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        `;
+        document.body.appendChild(toast);
+        setTimeout(() => toast.remove(), 5000);
+    }
+    
+    if (clockInBtn) {
+        clockInBtn.addEventListener('click', async () => {
+            try {
+                const response = await fetch('{% url "clock_in" %}', {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': '{{ csrf_token }}',
+                    },
+                });
+                const data = await response.json();
+                if (response.ok) {
+                    showToast(data.message);
+                    location.reload();
+                } else {
+                    showToast(data.error, 'danger');
+                }
+            } catch (error) {
+                showToast('An error occurred', 'danger');
+            }
+        });
+    }
+    
+    if (clockOutBtn) {
+        clockOutBtn.addEventListener('click', async () => {
+            try {
+                const response = await fetch('{% url "clock_out" %}', {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': '{{ csrf_token }}',
+                    },
+                });
+                const data = await response.json();
+                if (response.ok) {
+                    showToast(data.message);
+                    location.reload();
+                } else {
+                    showToast(data.error, 'danger');
+                }
+            } catch (error) {
+                showToast('An error occurred', 'danger');
+            }
+        });
+    }
+});
+</script>
+{% endblock %}
+{% endblock %}
+

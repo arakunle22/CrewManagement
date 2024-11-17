@@ -1,0 +1,145 @@
+{% extends 'crew/portal.html' %}
+{% load static %}
+
+{% block page_title %}Tasks{% endblock %}
+
+{% block portal_content %}
+<div class="row mb-4">
+    <div class="col">
+        <form method="get" class="card">
+            <div class="card-body">
+                <div class="row align-items-end">
+                    <div class="col-md-4">
+                        {{ filter_form.status.label_tag }}
+                        {{ filter_form.status }}
+                    </div>
+                    <div class="col-md-2">
+                        <button type="submit" class="btn btn-primary">Filter</button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">My Tasks</h5>
+            </div>
+            <div class="card-body">
+                {% if tasks %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Title</th>
+                                <th>Description</th>
+                                <th>Status</th>
+                                <th>Deadline</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for task in tasks %}
+                            <tr>
+                                <td>{{ task.title }}</td>
+                                <td>{{ task.description|truncatewords:20 }}</td>
+                                <td>
+                                    <span class="badge bg-{{ task.get_status_color }}">
+                                        {{ task.get_status_display }}
+                                    </span>
+                                </td>
+                                <td>{{ task.deadline|date:"M d, Y" }}</td>
+                                <td>
+                                    <div class="btn-group">
+                                        <button type="button" 
+                                                class="btn btn-sm btn-outline-primary dropdown-toggle" 
+                                                data-bs-toggle="dropdown">
+                                            Update Status
+                                        </button>
+                                        <ul class="dropdown-menu">
+                                            {% for status, label in task.STATUS_CHOICES %}
+                                            <li>
+                                                <form method="post" 
+                                                      action="{% url 'update_task' task.id %}"
+                                                      class="status-update-form">
+                                                    {% csrf_token %}
+                                                    <input type="hidden" name="status" value="{{ status }}">
+                                                    <button type="submit" 
+                                                            class="dropdown-item {% if task.status == status %}active{% endif %}">
+                                                        {{ label }}
+                                                    </button>
+                                                </form>
+                                            </li>
+                                            {% endfor %}
+                                        </ul>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <p class="text-muted text-center my-4">No tasks found.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const forms = document.querySelectorAll('.status-update-form');
+    
+    function showToast(message, type = 'success') {
+        const toast = document.createElement('div');
+        toast.className = `alert alert-${type} alert-dismissible fade show position-fixed top-0 end-0 m-3`;
+        toast.setAttribute('role', 'alert');
+        toast.innerHTML = `
+            ${message}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        `;
+        document.body.appendChild(toast);
+        
+        // Bootstrap 5 alert initialization
+        const bsAlert = new bootstrap.Alert(toast);
+        
+        setTimeout(() => {
+            bsAlert.close();
+        }, 5000);
+    }
+    
+    forms.forEach(form => {
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            try {
+                const response = await fetch(form.action, {
+                    method: 'POST',
+                    body: new FormData(form),
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                    }
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    showToast('Task status updated successfully');
+                    setTimeout(() => location.reload(), 1000);
+                } else {
+                    showToast('Failed to update task status', 'danger');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showToast('An error occurred', 'danger');
+            }
+        });
+    });
+});
+</script>
+{% endblock %}

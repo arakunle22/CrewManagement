@@ -1,0 +1,92 @@
+<!-- home.html -->
+{% extends 'base.html' %}
+
+{% block title %}Welcome to CrewMS{% endblock %}
+
+{% block content %}
+<div class="d-flex flex-column align-items-center justify-content-center min-vh-80">
+    <!-- Hero Section -->
+    <div class="text-center mb-5">
+        <h1 class="display-4 fw-bold text-primary mb-3">
+            Welcome to Crew Management System
+        </h1>
+        <p class="lead text-secondary mx-auto" style="max-width: 600px;">
+            Streamline your crew operations with our comprehensive management system.
+            Join thousands of maritime professionals worldwide.
+        </p>
+    </div>
+
+    <!-- Action Cards -->
+    <div class="row row-cols-1 row-cols-md-2 g-4 mb-5" style="max-width: 800px;">
+        <!-- Login Card -->
+        <div class="col">
+            <div class="card border-primary shadow-sm h-100">
+                <div class="card-body text-center">
+                    <i class="fas fa-sign-in-alt display-4 text-primary mb-3"></i>
+                    <h5 class="card-title fw-semibold">Crew Login</h5>
+                    <p class="card-text text-muted">
+                        Already approved? Access your crew portal here.
+                    </p>
+                    <a href="{% url 'crew_login' %}" class="btn btn-primary mt-3">
+                        Login to Portal
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Registration Card -->
+        <div class="col">
+            <div class="card border-success shadow-sm h-100">
+                <div class="card-body text-center">
+                    <i class="fas fa-user-plus display-4 text-success mb-3"></i>
+                    <h5 class="card-title fw-semibold">New Recruitment</h5>
+                    <p class="card-text text-muted">
+                        Start your journey with us by registering as a crew member.
+                    </p>
+                    <a href="{% url 'register' %}" class="btn btn-success mt-3">
+                        Register Now
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Check Recruitment Status Card -->
+        <div class="col">
+            <div class="card border-info shadow-sm h-100">
+                <div class="card-body text-center">
+                    <i class="fas fa-clipboard-list display-4 text-info mb-3"></i>
+                    <h5 class="card-title fw-semibold">Check Recruitment Status</h5>
+                    <p class="card-text text-muted">
+                        Want to know the status of your recruitment? Click here.
+                    </p>
+                    <a href="{% url 'login' %}" class="btn btn-info mt-3">
+                        Check Status
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Features Section -->
+    <div class="container">
+        <h3 class="text-center fw-bold mb-4">Why Choose CrewMS?</h3>
+        <div class="row row-cols-1 row-cols-md-3 g-4">
+            <div class="col text-center">
+                <i class="fas fa-shield-alt display-5 text-primary mb-3"></i>
+                <h5 class="fw-semibold">Secure System</h5>
+                <p class="text-muted">Advanced security measures to protect your data.</p>
+            </div>
+            <div class="col text-center">
+                <i class="fas fa-clock display-5 text-primary mb-3"></i>
+                <h5 class="fw-semibold">Real-time Updates</h5>
+                <p class="text-muted">Stay informed with instant notifications.</p>
+            </div>
+            <div class="col text-center">
+                <i class="fas fa-users display-5 text-primary mb-3"></i>
+                <h5 class="fw-semibold">Team Management</h5>
+                <p class="text-muted">Efficiently manage your crew members.</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

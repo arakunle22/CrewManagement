@@ -1,0 +1,161 @@
+{% extends 'crew/portal.html' %}
+{% block page_title %}Profile{% endblock %}
+
+{% block portal_content %}
+<div class="row">
+    <div class="col-4">
+        <div class="card mb-4">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">Crew Information</h5>
+            </div>
+            <div class="card-body">
+                <div class="text-center mb-4">
+                    <h4>{{ profile.first_name }} {{ profile.last_name }}</h4>
+                    <p class="text-muted mb-2">{{ profile.position.title }}</p>
+                    <span class="badge bg-info text-wrap" style="max-width: 100%;">
+                        ID: {{ profile.crew_id }}
+                      </span>
+                    <span class="badge {% if profile.recruitment_status == 'approved' %}bg-success{% elif profile.recruitment_status == 'pending' %}bg-warning{% else %}bg-danger{% endif %}">
+                        {{ profile.recruitment_status|title }}
+                    </span>
+                </div>
+                
+                <ul class="list-unstyled">
+                    <li class="mb-2"><i class="bi bi-building"></i> <strong>Department:</strong> {{ profile.department.name }}</li>
+                    <li class="mb-2"><i class="bi bi-telephone"></i> <strong>Phone:</strong> {{ profile.phone_number }}</li>
+                    <li class="mb-2"><i class="bi bi-envelope"></i> <strong>Email:</strong> {{ profile.user.email }}</li>
+                    <li class="mb-2"><i class="bi bi-calendar"></i> <strong>Date of Birth:</strong> {{ profile.date_of_birth|date }}</li>
+                    <li class="mb-2"><i class="bi bi-clock-history"></i> <strong>Join Date:</strong> {{ profile.date_joined|date }}</li>
+                </ul>
+            </div>
+        </div>
+
+        {% if recent_attendance %}
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">Recent Attendance</h5>
+            </div>
+            <div class="card-body p-0">
+                <div class="list-group list-group-flush">
+                    {% for record in recent_attendance %}
+                    <div class="list-group-item">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <strong>{{ record.date|date:"D, M d" }}</strong>
+                            <span class="text-muted">
+                                {% if record.hours_worked %}
+                                {{ record.hours_worked|floatformat:1 }} hrs
+                                {% else %}
+                                -
+                                {% endif %}
+                            </span>
+                        </div>
+                        {% if record.clock_in %}
+                        <small class="text-success">In: {{ record.clock_in|time }}</small>
+                        {% endif %}
+                        {% if record.clock_out %}
+                        <br><small class="text-danger">Out: {{ record.clock_out|time }}</small>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    <div class="col-8">
+        {% if recent_performance %}
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">Latest Performance Review</h5>
+            </div>
+            <div class="card-body">
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <p><strong>Review Date:</strong> {{ recent_performance.review_date|date }}</p>
+                        <p><strong>Reviewer:</strong> {{ recent_performance.reviewed_by.get_full_name }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <p><strong>Rating:</strong> 
+                            <span class="badge {% if recent_performance.rating >= 4 %}bg-success{% elif recent_performance.rating >= 3 %}bg-info{% elif recent_performance.rating >= 2 %}bg-warning{% else %}bg-danger{% endif %}">
+                                {{ recent_performance.get_rating_display }}
+                            </span>
+                        </p>
+                    </div>
+                </div>
+                <h6>Comments:</h6>
+                <p class="mb-0">{{ recent_performance.comments }}</p>
+            </div>
+        </div>
+        {% endif %}
+
+        {% if active_tasks %}
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">Current Tasks</h5>
+            </div>
+            <div class="card-body">
+                {% for task in active_tasks %}
+                <div class="mb-3">
+                    <h6>{{ task.title }}</h6>
+                    <p class="mb-1">{{ task.description }}</p>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span class="badge {% if task.status == 'pending' %}bg-warning{% else %}bg-info{% endif %}">
+                            {{ task.get_status_display }}
+                        </span>
+                        <small class="text-muted">Due: {{ task.deadline|date }}</small>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        {% if pending_leaves %}
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">Pending Leave Requests</h5>
+            </div>
+            <div class="card-body">
+                {% for leave in pending_leaves %}
+                <div class="mb-3">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span>{{ leave.start_date|date }} - {{ leave.end_date|date }}</span>
+                        <span class="badge bg-warning">{{ leave.get_status_display }}</span>
+                    </div>
+                    <p class="mb-0 mt-1"><small>{{ leave.reason }}</small></p>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        {% if latest_payroll %}
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Latest Payroll Information</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <p><strong>Month:</strong> {{ latest_payroll.month|date:"F Y" }}</p>
+                        <p><strong>Basic Salary:</strong> ${{ latest_payroll.basic_salary|floatformat:2 }}</p>
+                        <p><strong>Overtime Pay:</strong> ${{ latest_payroll.overtime_pay|floatformat:2 }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <p><strong>Deductions:</strong> ${{ latest_payroll.deductions|floatformat:2 }}</p>
+                        <p><strong>Net Salary:</strong> ${{ latest_payroll.net_salary|floatformat:2 }}</p>
+                        <p>
+                            <strong>Status:</strong>
+                            <span class="badge {% if latest_payroll.payment_status %}bg-success{% else %}bg-warning{% endif %}">
+                                {{ latest_payroll.payment_status|yesno:"Paid,Pending" }}
+                            </span>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
